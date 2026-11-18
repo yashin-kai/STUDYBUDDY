@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyBuddy: AI Learning Chatbot</title>
+<style>
+  :root { --bg:#f5f5f7; --card:#fff; --text:#1d1d1f; --user:#2563eb; --bot:#e8e8ed; --border:#d2d2d7; color-scheme: light dark; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#111; --card:#1c1c1e; --text:#f5f5f7; --user:#3b82f6; --bot:#2c2c2e; --border:#3a3a3c; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, sans-serif; background:var(--bg); color:var(--text); display:flex; justify-content:center; }
+  .app { width:100%; max-width:640px; height:100vh; display:flex; flex-direction:column; background:var(--card); }
+  header { padding:16px; border-bottom:1px solid var(--border); }
+  header h1 { margin:0; font-size:1.2rem; }
+  header p { margin:4px 0 0; font-size:.85rem; opacity:.7; }
+  #chat { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .msg { max-width:80%; padding:10px 14px; border-radius:16px; line-height:1.4; white-space:pre-wrap; }
+  .bot { background:var(--bot); align-self:flex-start; }
+  .user { background:var(--user); color:#fff; align-self:flex-end; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; padding:0 16px 8px; }
+  .chips button { border:1px solid var(--border); background:transparent; color:var(--text); padding:6px 12px; border-radius:16px; font-size:.85rem; cursor:pointer; }
+  .row { display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--border); }
+  #input { flex:1; padding:12px; font-size:1rem; border:1px solid var(--border); border-radius:12px; background:var(--bg); color:var(--text); }
+  #send { padding:0 18px; border:0; border-radius:12px; background:var(--user); color:#fff; font-size:1rem; cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>StudyBuddy</h1>
+    <p>Ask me about AI, machine learning, LLMs and chatbots.</p>
+  </header>
+  <div id="chat"></div>
+  <div class="chips" id="chips"></div>
+  <div class="row">
+    <input id="input" type="text" placeholder="Type your question..." maxlength="1000" autocomplete="off">
+    <button id="send">Send</button>
+  </div>
+</div>
+
+<script>
+const KNOWLEDGE = [
+  [["hello","hi ","hey"], "Hi! I'm StudyBuddy. Ask me about AI, machine learning, chatbots or LLMs."],
+  [["what is ai","artificial intelligence"], "AI is software that does tasks that normally need human intelligence, like understanding language, recognising images or making decisions."],
+  [["machine learning","what is ml"], "Machine learning is a way of teaching computers using data instead of fixed rules. The model finds patterns and improves with examples."],
+  [["deep learning","neural network"], "Neural networks are layers of simple connected units loosely inspired by the brain. Deep learning means using many layers to learn complex patterns."],
+  [["llm","large language model","gpt","gemini"], "An LLM is a neural network trained on huge amounts of text to predict the next word. That skill lets it write, answer questions and chat."],
+  [["rag","retrieval"], "RAG (Retrieval-Augmented Generation) lets a model look up relevant documents first, then answer using them. That reduces made-up answers."],
+  [["prompt"], "A prompt is the instruction you give an AI model. Clear, specific prompts with examples give better results."],
+  [["fine tune","fine-tune"], "Fine-tuning means training an existing model a bit more on your own data so it specialises in your task."],
+  [["chatbot"], "A chatbot is a program that talks with users. It can be rule-based (fixed replies) or AI-based (generated replies)."],
+  [["python"], "Python is the most popular language for AI because of libraries like NumPy, PyTorch and scikit-learn."],
+  [["joke"], "Why did the neural network fail class? It kept overfitting to the practice questions!"],
+  [["thanks","thank you"], "You're welcome! Ask me anything else."],
+  [["bye","goodbye"], "Bye! Keep learning!"]
+];
+const FALLBACK = "I'm not sure about that one. Try asking about AI, machine learning, LLMs, RAG, prompts or chatbots.";
+const MAX_CHARS = 1000;
+
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+
+function addMessage(text, who) {
+  const div = document.createElement("div");
+  div.className = "msg " + who;
+  div.textContent = text;           // textContent keeps user input safe
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function getReply(message) {
+  const text = " " + message.toLowerCase() + " ";
+  for (const [keys, answer] of KNOWLEDGE) {
+    if (keys.some(k => text.includes(k))) return answer;
+  }
+  return FALLBACK;
+}
+
+function send(text) {
+  text = (text || "").trim();
+  if (!text) { addMessage("Please type a question first.", "bot"); return; }
+  if (text.length > MAX_CHARS) { addMessage("That message is too long. Please keep it under " + MAX_CHARS + " characters.", "bot"); return; }
+  addMessage(text, "user");
+  input.value = "";
+  setTimeout(() => addMessage(getReply(text), "bot"), 400);
+}
+
+document.getElementById("send").onclick = () => send(input.value);
+input.addEventListener("keydown", e => { if (e.key === "Enter") send(input.value); });
+
+["What is machine learning?", "Explain RAG simply", "What is an LLM?", "Tell me a joke"].forEach(q => {
+  const b = document.createElement("button");
+  b.textContent = q;
+  b.onclick = () => send(q);
+  document.getElementById("chips").appendChild(b);
+});
+
+addMessage("Hi! I'm StudyBuddy, your AI learning companion. What would you like to learn about?", "bot");
+</script>
+</body>
+</html>

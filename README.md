@@ -3,7 +3,11 @@
 A simple chatbot that explains AI and machine learning concepts to beginners.
 Built for the µLearn CHN AI IG Lead selection task.
 
-**Live demo:** <add your Hugging Face Spaces link here>
+**Live demo:** <add your GitHub Pages link here, e.g. https://your-username.github.io/studybuddy-chatbot/>
+
+## Two versions
+- `index.html`: web version (rule-based) that runs in any browser and is hosted free on GitHub Pages. No install needed.
+- `app.py`: Gradio version with optional Gemini AI mode, run locally (see below).
 
 ## Features
 - Chat interface built with Gradio
