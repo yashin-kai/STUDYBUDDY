@@ -3,7 +3,7 @@
 A conversational AI chatbot built with Streamlit and Google Gemini.
 Made for the µLearn CHN AI IG Lead selection task.
 
-**Live demo:** <add your Streamlit app link here, e.g. https://your-app-name.streamlit.app>
+**Live demo:** <https://studybuddy-7q7ypv5tr8a23q3uwpmyyz.streamlit.app/>, e.g. https://your-app-name.streamlit.app>
 
 ## Features
 - Real AI conversation (not scripted replies) that remembers the earlier messages in the chat
