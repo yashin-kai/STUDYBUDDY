@@ -30,7 +30,14 @@ def get_secret(name, default=None):
 
 
 API_KEY = get_secret("GEMINI_API_KEY")
-MODEL = get_secret("GEMINI_MODEL", "gemini-flash-latest")
+_custom_model = get_secret("GEMINI_MODEL")
+# The app tries these models in order until one works.
+MODELS = ([_custom_model] if _custom_model else []) + [
+    "gemini-2.5-flash",
+    "gemini-3.6-flash",
+    "gemini-3-flash-preview",
+    "gemini-2.5-flash-lite",
+]
 
 if not API_KEY:
     st.error("No API key found. Add GEMINI_API_KEY in the app's Secrets (see README).")
@@ -57,13 +64,25 @@ def stream_reply(history):
     for m in history[-MAX_HISTORY_MESSAGES:]:
         role = "user" if m["role"] == "user" else "model"
         contents.append(types.Content(role=role, parts=[types.Part(text=m["content"])]))
-    for chunk in client.models.generate_content_stream(
-        model=MODEL,
-        contents=contents,
-        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
-    ):
-        if chunk.text:
-            yield chunk.text
+    last_error = None
+    for model in MODELS:
+        started = False
+        try:
+            for chunk in client.models.generate_content_stream(
+                model=model,
+                contents=contents,
+                config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
+            ):
+                if chunk.text:
+                    started = True
+                    yield chunk.text
+            return
+        except Exception as error:
+            if started:
+                raise  # failed in the middle of an answer
+            print(f"[warning] model {model} failed: {error}")
+            last_error = error  # try the next model
+    raise last_error
 
 
 for m in st.session_state.messages:
