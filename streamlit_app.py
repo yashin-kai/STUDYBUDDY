@@ -30,7 +30,7 @@ def get_secret(name, default=None):
 
 
 API_KEY = get_secret("GEMINI_API_KEY")
-MODEL = get_secret("GEMINI_MODEL", "gemini-2.5-flash")
+MODEL = get_secret("GEMINI_MODEL", "gemini-flash-latest")
 
 if not API_KEY:
     st.error("No API key found. Add GEMINI_API_KEY in the app's Secrets (see README).")
@@ -89,3 +89,4 @@ if prompt:
                 print(f"[warning] API error: {error}")
                 st.session_state.messages.pop()  # remove the unanswered user message
                 st.error("Sorry, the AI service is busy or unavailable right now. Please try again in a minute.")
+                st.caption(f"Technical detail: {str(error)[:300]}")
